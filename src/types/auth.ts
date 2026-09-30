@@ -1,3 +1,5 @@
+import { UserCustomPermissions } from './permissions.ts';
+
 export type UserRole = 'ADMIN' | 'FORMATEUR' | 'BÉNÉFICIAIRE';
 
 export interface UserProfile {
@@ -7,8 +9,11 @@ export interface UserProfile {
   role: UserRole;
   createdAt: string;
   group?: string;
+  assignedTraining?: string;
   title?: string;
   avatar?: string;
+  studentId?: string;
+  customPermissions?: UserCustomPermissions;
 }
 
 export interface DemoUser {

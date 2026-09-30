@@ -5,44 +5,185 @@
       "description": "Profil d'un utilisateur du Centre Deuxième Chance",
       "type": "object",
       "properties": {
-        "uid": {
-          "type": "string",
-          "maxLength": 128
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["ADMIN", "FORMATEUR", "BÉNÉFICIAIRE"] },
+        "studentId": { "type": "string", "maxLength": 64 },
+        "assignedGroup": { "type": "string", "maxLength": 100 },
+        "permissions": {
+          "type": "object",
+          "description": "Droits personnalisés par rubrique pour l'utilisateur"
         },
-        "email": {
-          "type": "string",
-          "format": "email",
-          "maxLength": 256
+        "dataScope": {
+          "type": "object",
+          "description": "Limites d'accès aux données (groupes, formations, bénéficiaires)"
         },
-        "displayName": {
-          "type": "string",
-          "maxLength": 100
-        },
-        "role": {
-          "type": "string",
-          "enum": [
-            "ADMIN",
-            "FORMATEUR",
-            "BÉNÉFICIAIRE"
-          ]
-        },
-        "createdAt": {
-          "type": "string"
-        }
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "displayName", "role", "createdAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Dossier complet d'un élève / bénéficiaire du Centre Deuxième Chance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "registrationNumber": { "type": "string", "maxLength": 64 },
+        "massarNumber": { "type": "string", "maxLength": 64 },
+        "lastName": { "type": "string", "maxLength": 100 },
+        "firstName": { "type": "string", "maxLength": 100 },
+        "lastNameArabic": { "type": "string", "maxLength": 100 },
+        "firstNameArabic": { "type": "string", "maxLength": 100 },
+        "photoUrl": { "type": "string", "maxLength": 1000 },
+        "birthDate": { "type": "string" },
+        "birthPlace": { "type": "string", "maxLength": 100 },
+        "gender": { "type": "string", "enum": ["Homme", "Femme"] },
+        "cin": { "type": "string", "maxLength": 30 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 250 },
+        "city": { "type": "string", "maxLength": 100 },
+        "schoolLevel": { "type": "string", "enum": ["Primaire", "1ère année collège", "2ème année collège", "3ème année collège", "Autre"] },
+        "schoolLevelOther": { "type": "string", "maxLength": 100 },
+        "registrationDate": { "type": "string" },
+        "trainingYear": { "type": "string", "maxLength": 20 },
+        "training": { "type": "string", "maxLength": 100 },
+        "group": { "type": "string", "maxLength": 100 },
+        "trainer": { "type": "string", "maxLength": 100 },
+        "room": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["Actif", "Suspendu", "Abandonné", "Terminé"] },
+        "guardianName": { "type": "string", "maxLength": 100 },
+        "guardianRelation": { "type": "string", "maxLength": 50 },
+        "guardianPhone": { "type": "string", "maxLength": 30 },
+        "guardianPhoneSecondary": { "type": "string", "maxLength": 30 },
+        "guardianAddress": { "type": "string", "maxLength": 250 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
       },
       "required": [
-        "uid",
-        "email",
-        "displayName",
-        "role",
-        "createdAt"
+        "id",
+        "registrationNumber",
+        "massarNumber",
+        "lastName",
+        "firstName",
+        "lastNameArabic",
+        "firstNameArabic",
+        "birthDate",
+        "gender",
+        "phone",
+        "schoolLevel",
+        "registrationDate",
+        "trainingYear",
+        "training",
+        "group",
+        "status"
       ]
+    },
+    "AttendanceRecord": {
+      "title": "AttendanceRecord",
+      "description": "Historique des séances et pointages d'assiduité",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "studentId": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string" },
+        "training": { "type": "string", "maxLength": 100 },
+        "group": { "type": "string", "maxLength": 100 },
+        "session": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["Présent", "Absent", "Retard", "Excusé"] },
+        "justification": { "type": "string", "enum": ["Non requise", "Justifiée", "Non justifiée", "En attente"] },
+        "justificationReason": { "type": "string", "maxLength": 250 },
+        "remark": { "type": "string", "maxLength": 250 },
+        "recordedBy": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "studentId", "date", "training", "group", "session", "status", "justification"]
+    },
+    "StudentDocument": {
+      "title": "StudentDocument",
+      "description": "Document administratif, scolaire ou médical d'un élève",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "studentId": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 150 },
+        "type": { "type": "string", "enum": ["CIN", "Photo", "Documents d'inscription", "Certificats", "Justificatifs d'absence", "Autres documents"] },
+        "fileUrl": { "type": "string", "maxLength": 1000 },
+        "fileName": { "type": "string", "maxLength": 150 },
+        "fileSize": { "type": "string", "maxLength": 50 },
+        "addedAt": { "type": "string" },
+        "addedBy": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["id", "studentId", "name", "type", "addedAt", "addedBy"]
+    },
+    "AttendanceSheet": {
+      "title": "AttendanceSheet",
+      "description": "Feuille de présence de séance par jour, formation, groupe et formateur",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string" },
+        "training": { "type": "string", "maxLength": 100 },
+        "group": { "type": "string", "maxLength": 100 },
+        "trainer": { "type": "string", "maxLength": 100 },
+        "session": { "type": "string", "maxLength": 50 },
+        "startTime": { "type": "string", "maxLength": 10 },
+        "endTime": { "type": "string", "maxLength": 10 },
+        "status": { "type": "string", "enum": ["Enregistré", "Validé", "Clôturé"] },
+        "totalStudents": { "type": "integer" },
+        "presentCount": { "type": "integer" },
+        "absentCount": { "type": "integer" },
+        "lateCount": { "type": "integer" },
+        "justifiedCount": { "type": "integer" },
+        "presenceRate": { "type": "number" },
+        "recordedBy": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "date", "training", "group", "trainer", "session", "startTime", "endTime"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Journal d'activité d'importation et d'exportation de données",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "type": { "type": "string", "enum": ["IMPORT", "EXPORT"] },
+        "userName": { "type": "string", "maxLength": 100 },
+        "userEmail": { "type": "string", "maxLength": 256 },
+        "format": { "type": "string", "maxLength": 20 },
+        "recordCount": { "type": "integer" },
+        "filtersUsed": { "type": "string", "maxLength": 300 },
+        "importMode": { "type": "string", "maxLength": 100 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "type", "userName", "userEmail", "format", "recordCount", "timestamp"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "UserProfile",
       "description": "Profils des utilisateurs et leurs rôles d'accès"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Dossiers des élèves et bénéficiaires"
+    },
+    "/students/{studentId}/attendance/{recordId}": {
+      "schema": "AttendanceRecord",
+      "description": "Présences et absences de l'élève"
+    },
+    "/students/{studentId}/documents/{docId}": {
+      "schema": "StudentDocument",
+      "description": "Documents rattachés à l'élève"
+    },
+    "/attendance_sheets/{sheetId}": {
+      "schema": "AttendanceSheet",
+      "description": "Feuilles d'émargement et de présence par séance"
+    },
+    "/activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Journal des imports et exports de données administratives"
     }
   }
 }

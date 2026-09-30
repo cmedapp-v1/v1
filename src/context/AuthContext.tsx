@@ -16,6 +16,7 @@ interface AuthContextType {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   loginWithDemo: (role: UserRole) => Promise<void>;
+  switchUser: (user: UserProfile) => void;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -49,6 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem(LOCAL_STORAGE_KEY);
       }
     }
+
+    const handleUserUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<UserProfile>;
+      if (customEvent.detail) {
+        setCurrentUser(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('c2c_user_updated', handleUserUpdated);
 
     const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
       if (!isMounted) return;
@@ -105,9 +115,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false;
+      window.removeEventListener('c2c_user_updated', handleUserUpdated);
       unsubscribe();
     };
   }, []);
+
+  const switchUser = (user: UserProfile) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
+    setCurrentUser(user);
+    window.dispatchEvent(new CustomEvent('c2c_user_updated', { detail: user }));
+  };
 
   const loginWithDemo = async (targetRole: UserRole) => {
     setLoading(true);
@@ -121,6 +138,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
+      // Check if custom permissions or updated profile exist in stored users
+      let existingCustomPermissions: any = undefined;
+      let existingTitle = demo.title;
+      let existingGroup = demo.group;
+      let existingTraining = undefined;
+
+      const storedUsersRaw = localStorage.getItem('c2c_all_users_v1');
+      if (storedUsersRaw) {
+        try {
+          const storedList = JSON.parse(storedUsersRaw) as UserProfile[];
+          const found = storedList.find(u => u.email.toLowerCase() === demo.email.toLowerCase() || u.role === targetRole);
+          if (found) {
+            if (found.customPermissions) existingCustomPermissions = found.customPermissions;
+            if (found.title) existingTitle = found.title;
+            if (found.group) existingGroup = found.group;
+            if (found.assignedTraining) existingTraining = found.assignedTraining;
+          }
+        } catch (e) {}
+      }
+
       // Build profile
       const demoProfile: UserProfile = {
         uid: `demo_${demo.role.toLowerCase()}`,
@@ -128,8 +165,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: demo.displayName,
         role: demo.role,
         createdAt: '2026-01-01T08:00:00.000Z',
-        title: demo.title,
-        group: demo.group,
+        title: existingTitle,
+        group: existingGroup,
+        assignedTraining: existingTraining,
+        customPermissions: existingCustomPermissions,
       };
 
       // Try sync profile to Firestore
@@ -250,6 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error,
         login,
         loginWithDemo,
+        switchUser,
         logout,
         clearError,
       }}

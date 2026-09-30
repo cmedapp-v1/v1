@@ -6,18 +6,26 @@ import {
   Clock, 
   Calendar, 
   Sparkles, 
-  CheckCircle,
-  Database,
-  ArrowRight,
-  Info
+  CheckCircle, 
+  Database, 
+  ArrowRight, 
+  Info,
+  Users,
+  GraduationCap,
+  ClipboardList
 } from 'lucide-react';
 
 interface RoleHomeViewProps {
   currentTab: string;
+  onNavigate?: (tabId: string) => void;
   onResetToHome: () => void;
 }
 
-export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetToHome }) => {
+export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ 
+  currentTab, 
+  onNavigate, 
+  onResetToHome 
+}) => {
   const { currentUser, role } = useAuth();
 
   // If a secondary tab is clicked
@@ -26,11 +34,9 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
       switch (currentTab) {
         case 'utilisateurs': return 'Gestion des Utilisateurs';
         case 'promotions': return 'Promotions & Groupes';
-        case 'absences_globales': return 'Registre Global des Absences';
         case 'justificatifs_admin': return 'Justificatifs & Décisions';
         case 'statistiques': return 'Rapports & Statistiques Région';
         case 'parametres': return 'Paramètres du Centre';
-        case 'emargement': return 'Émargement du Jour';
         case 'mes_groupes': return 'Mes Groupes & Stagiaires';
         case 'signalement': return 'Signaler une Absence';
         case 'cahier_liaison': return 'Cahier de Liaison Pédagogique';
@@ -50,34 +56,41 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
             <div>
               <span className="text-xs uppercase font-bold tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
-                Module en préparation
+                Module Système
               </span>
               <h2 className="text-2xl font-bold text-slate-900 mt-2">
                 {getTabTitle()}
               </h2>
               <p className="text-sm text-slate-500 mt-1">
-                Conformément aux spécifications de la première étape, les modules métier (présences, justificatifs et rapports) seront activés ultérieurement.
+                Les modules « Pointage des présences » et « Élèves / Bénéficiaires » sont entièrement configurés et opérationnels.
               </p>
             </div>
-            <button
-              onClick={onResetToHome}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer self-start sm:self-auto shadow-xs"
-            >
-              <span>Retour à l'accueil</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="mt-8 border-2 border-dashed border-slate-200 rounded-xl p-10 text-center bg-slate-50/50">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-800 mx-auto flex items-center justify-center mb-3">
-              <Clock className="w-6 h-6" />
+            <div className="flex items-center gap-2">
+              {onNavigate && (
+                <>
+                  <button
+                    onClick={() => onNavigate('pointage')}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs"
+                  >
+                    <ClipboardList className="w-3.5 h-3.5" />
+                    <span>Pointage Présences</span>
+                  </button>
+                  <button
+                    onClick={() => onNavigate('eleves')}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-xs font-semibold rounded-xl transition cursor-pointer"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Dossiers Élèves</span>
+                  </button>
+                </>
+              )}
+              <button
+                onClick={onResetToHome}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer"
+              >
+                <span>Accueil</span>
+              </button>
             </div>
-            <h3 className="text-base font-semibold text-slate-800">
-              Espace prêt pour intégration
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mt-1">
-              La structure de données et les règles de sécurité Firestore sont d'ores et déjà en place pour alimenter cette vue.
-            </p>
           </div>
         </div>
       </div>
@@ -90,44 +103,26 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
       case 'ADMIN':
         return {
           title: 'Espace Direction & Administration',
-          subtitle: 'Supervision générale du Centre Deuxième Chance et administration des accès',
+          subtitle: 'Supervision générale du Centre Deuxième Chance, pointage des séances et gestion des accès',
           roleBadge: 'ADMIN',
           badgeClass: 'bg-blue-900 text-blue-50',
-          summaryDescription: 'Bienvenue sur votre espace d’accueil administrateur. Vous disposez des habilitations complètes pour superviser les parcours et l’assiduité du centre.',
-          nextSteps: [
-            'Supervision des taux d’assiduité par groupe et par filière',
-            'Validation des justificatifs médicaux et administratifs',
-            'Génération des bilans officiels pour les partenaires institutionnels',
-            'Gestion des comptes et droits formateurs et bénéficiaires'
-          ]
+          summaryDescription: 'Bienvenue sur votre espace d’accueil administrateur. Vous disposez des habilitations complètes pour superviser les séances, enregistrer les présences et gérer les dossiers élèves.',
         };
       case 'FORMATEUR':
         return {
           title: 'Espace Formateur Référent',
-          subtitle: 'Gestion pédagogique, émargement des sessions et suivi des stagiaires',
+          subtitle: 'Pointage numérique des présences du jour, gestion des séances et suivi pédagogique',
           roleBadge: 'FORMATEUR',
           badgeClass: 'bg-indigo-700 text-indigo-50',
-          summaryDescription: 'Bienvenue sur votre espace d’accueil formateur. Vous avez accès au pointage en direct et au suivi des stagiaires de vos groupes.',
-          nextSteps: [
-            'Émargement numérique des séances du matin et de l’après-midi',
-            'Signalement immédiat des retards et absences injustifiées',
-            'Consultation de l’historique des présences par stagiaire',
-            'Liaison avec la coordination pédagogique et sociale'
-          ]
+          summaryDescription: 'Bienvenue sur votre espace formateur. Vous avez accès à l’émargement en direct de vos groupes assignés et à la consultation des feuilles de présence antérieures.',
         };
       case 'BÉNÉFICIAIRE':
         return {
           title: 'Mon Espace Bénéficiaire',
-          subtitle: 'Suivi de mon parcours de formation et déclaration de mes absences',
+          subtitle: 'Suivi de mon assiduité, consultation de mes présences et justificatifs',
           roleBadge: 'BÉNÉFICIAIRE',
           badgeClass: 'bg-sky-600 text-sky-50',
-          summaryDescription: 'Bienvenue sur votre espace personnel. Vous pourrez bientôt consulter vos créneaux de formation et déposer vos justificatifs en toute simplicité.',
-          nextSteps: [
-            'Déclaration en ligne de vos absences prévues ou imprévues',
-            'Dépôt sécurisé de vos justificatifs (certificat médical, convocation)',
-            'Consultation en direct de votre taux d’assiduité mensuel',
-            'Messagerie directe avec votre formateur référent'
-          ]
+          summaryDescription: 'Bienvenue sur votre espace personnel. Vous pouvez consulter vos créneaux de formation, votre taux de présence et vos justificatifs.',
         };
       default:
         return {
@@ -136,7 +131,6 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
           roleBadge: 'UTILISATEUR',
           badgeClass: 'bg-slate-700 text-slate-50',
           summaryDescription: 'Bienvenue sur le portail du Centre Deuxième Chance.',
-          nextSteps: []
         };
     }
   };
@@ -192,39 +186,58 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
         </div>
       </div>
 
-      {/* Empty Home Page Canvas (As requested: "avec une page d'accueil vide pour chacun") */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-8 sm:p-12 shadow-xs text-center">
-        <div className="max-w-lg mx-auto space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 mx-auto flex items-center justify-center shadow-xs">
-            <Building2 className="w-8 h-8 text-blue-700" />
-          </div>
-
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-              Page d’accueil — Espace {content.roleBadge}
-            </h3>
-            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-              {content.summaryDescription}
-            </p>
-          </div>
-
-          {/* Clean notice indicating this is step 1 */}
-          <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200/80 text-left text-xs text-blue-950 space-y-2 mt-6">
-            <div className="flex items-center gap-2 font-bold text-blue-900">
-              <Info className="w-4 h-4 text-blue-700 shrink-0" />
-              <span>Étape 1 validée : Authentification & Navigation par rôle</span>
+      {/* Operational modules cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Module 1: Pointage des présences */}
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-800/80 text-blue-200 border border-blue-700">
+              <ClipboardList className="w-3.5 h-3.5 text-blue-300" />
+              <span>Nouveau Module Actif</span>
             </div>
-            <p className="text-slate-600 leading-relaxed pl-6">
-              Cette page d'accueil est actuellement vierge conformément aux consignes. Elle sera enrichie lors de la prochaine étape avec les modules métiers :
+            <h3 className="text-xl font-bold tracking-tight">
+              Pointage des Présences par Séance
+            </h3>
+            <p className="text-xs text-blue-200 leading-relaxed">
+              Sélection de séance (date, formation, groupe, créneau horaire), émargement individuel (Présent, Absent, Retard, Justifiée), pointage rapide et impression de la feuille officielle.
             </p>
-            <ul className="pl-6 space-y-1 text-slate-700 list-disc list-inside">
-              {content.nextSteps.map((step, idx) => (
-                <li key={idx} className="text-slate-600">
-                  {step}
-                </li>
-              ))}
-            </ul>
           </div>
+
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('pointage')}
+              className="px-4 py-2.5 bg-white hover:bg-blue-50 text-blue-950 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-xs self-start"
+            >
+              <span>Accéder au Pointage</span>
+              <ArrowRight className="w-4 h-4 text-blue-800" />
+            </button>
+          )}
+        </div>
+
+        {/* Module 2: Rubrique Élèves / Bénéficiaires */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
+              <Users className="w-3.5 h-3.5 text-blue-700" />
+              <span>Dossiers & Scolarité</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+              Rubrique « Élèves / Bénéficiaires »
+            </h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Identification (N° Inscription, N° MASSAR, nom arabe RTL), scolarité, responsable, historique des absences, documents archivés, import/export Excel & CSV.
+            </p>
+          </div>
+
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('eleves')}
+              className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-xs self-start"
+            >
+              <span>Consulter les Bénéficiaires</span>
+              <ArrowRight className="w-4 h-4 text-slate-300" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -235,9 +248,9 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-slate-900">Sécurité & Rôles</p>
+            <p className="font-bold text-slate-900">Permissions par Formateur</p>
             <p className="text-slate-500 mt-0.5">
-              Accès cloisonné selon les habilitations {role}.
+              Émargement restreint aux groupes affectés de l'enseignant.
             </p>
           </div>
         </div>
@@ -247,9 +260,9 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
             <Calendar className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-slate-900">Centre Deuxième Chance</p>
+            <p className="font-bold text-slate-900">Anti-Doublons Séance</p>
             <p className="text-slate-500 mt-0.5">
-              Année pédagogique 2026 en cours.
+              Détection automatique des séances déjà pointées.
             </p>
           </div>
         </div>
@@ -259,9 +272,9 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({ currentTab, onResetT
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-slate-900">Prêt pour l'étape 2</p>
+            <p className="font-bold text-slate-900">Impression & Export Excel</p>
             <p className="text-slate-500 mt-0.5">
-              Présences, justificatifs et rapports.
+              Feuille officielle prête avec cadres pour signatures.
             </p>
           </div>
         </div>

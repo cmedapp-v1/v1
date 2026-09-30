@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
-import { Menu, LogOut, Bell, Shield, Briefcase, User, CalendarDays } from 'lucide-react';
+import { UserRole } from '../types/auth.ts';
+import { Menu, LogOut, Bell, Shield, Briefcase, User, CalendarDays, RefreshCw, ChevronDown } from 'lucide-react';
 
 interface NavbarProps {
   onToggleMobileMenu: () => void;
@@ -8,7 +9,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu, currentTabName }) => {
-  const { currentUser, role, logout } = useAuth();
+  const { currentUser, role, logout, loginWithDemo } = useAuth();
+  const [showRoleSwitcher, setShowRoleSwitcher] = useState<boolean>(false);
 
   const getRoleBadge = () => {
     switch (role) {
@@ -50,8 +52,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu, currentTabNa
     year: 'numeric'
   }).format(new Date());
 
-  // Capitalize first letter of date
   const capitalizedDate = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
+
+  const handleQuickSwitch = async (targetRole: UserRole) => {
+    setShowRoleSwitcher(false);
+    await loginWithDemo(targetRole);
+  };
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
@@ -82,13 +88,69 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu, currentTabNa
         </div>
       </div>
 
-      {/* Right section: Role badge on mobile, User profile & Logout */}
-      <div className="flex items-center gap-3">
-        <div className="sm:hidden">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${roleBadge.bg}`}>
-            <RoleIcon className="w-2.5 h-2.5" />
-            <span>{roleBadge.label}</span>
-          </span>
+      {/* Right section: Quick role switcher, User profile & Logout */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Quick Role Switcher for Testing Permissions Dynamically */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold transition cursor-pointer"
+            title="Tester l'application avec un autre rôle"
+          >
+            <span className="text-[11px] text-slate-500">Rôle :</span>
+            <span className="font-bold text-slate-900">{role}</span>
+            <ChevronDown className="w-3 h-3 text-slate-500" />
+          </button>
+
+          {showRoleSwitcher && (
+            <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs">
+              <div className="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
+                Changer de profil (Test)
+              </div>
+              <button
+                type="button"
+                onClick={() => handleQuickSwitch('ADMIN')}
+                className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-blue-50 cursor-pointer ${
+                  role === 'ADMIN' ? 'font-bold text-blue-900 bg-blue-50/50' : 'text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5 text-blue-900" />
+                  <span>Direction (ADMIN)</span>
+                </div>
+                {role === 'ADMIN' && <span className="text-[10px] text-blue-600 font-bold">Actif</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickSwitch('FORMATEUR')}
+                className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-indigo-50 cursor-pointer ${
+                  role === 'FORMATEUR' ? 'font-bold text-indigo-900 bg-indigo-50/50' : 'text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-3.5 h-3.5 text-indigo-700" />
+                  <span>Formateur (Pédagogie)</span>
+                </div>
+                {role === 'FORMATEUR' && <span className="text-[10px] text-indigo-600 font-bold">Actif</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickSwitch('BÉNÉFICIAIRE')}
+                className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-sky-50 cursor-pointer ${
+                  role === 'BÉNÉFICIAIRE' ? 'font-bold text-sky-900 bg-sky-50/50' : 'text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Bénéficiaire (Stagiaire)</span>
+                </div>
+                {role === 'BÉNÉFICIAIRE' && <span className="text-[10px] text-sky-600 font-bold">Actif</span>}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* User quick tag */}

@@ -26,6 +26,9 @@ import {
   User
 } from 'lucide-react';
 
+import { PermissionService } from '../services/permissionService.ts';
+import { RubricId } from '../types/permissions.ts';
+
 interface SidebarProps {
   currentTab: string;
   onSelectTab: (tabId: string) => void;
@@ -54,7 +57,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       case 'ADMIN':
         return [
           { id: 'accueil', label: 'Accueil & Supervision', icon: LayoutDashboard },
-          { id: 'utilisateurs', label: 'Gestion Utilisateurs', icon: Users },
+          { id: 'pointage', label: 'Pointage des Présences', icon: ClipboardList, badge: 'Séances' },
+          { id: 'eleves', label: 'Élèves / Bénéficiaires', icon: Users, badge: 'Principal' },
+          { id: 'utilisateurs', label: 'Gestion Utilisateurs & Droits', icon: Shield },
           { id: 'promotions', label: 'Promotions & Groupes', icon: GraduationCap },
           { id: 'absences_globales', label: 'Registre des Absences', icon: CalendarCheck },
           { id: 'justificatifs_admin', label: 'Justificatifs & Décisions', icon: FileCheck2 },
@@ -64,8 +69,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       case 'FORMATEUR':
         return [
           { id: 'accueil', label: 'Accueil Formateur', icon: LayoutDashboard },
-          { id: 'emargement', label: 'Émargement du Jour', icon: ClipboardList },
-          { id: 'mes_groupes', label: 'Mes Groupes & Stagiaires', icon: Users },
+          { id: 'pointage', label: 'Pointage des Présences', icon: ClipboardList, badge: 'Séances' },
+          { id: 'eleves', label: 'Élèves de mes groupes', icon: Users },
+          { id: 'mes_groupes', label: 'Mes Groupes & Stagiaires', icon: GraduationCap },
           { id: 'signalement', label: 'Signaler une Absence', icon: AlertTriangle },
           { id: 'cahier_liaison', label: 'Cahier de Liaison', icon: MessageSquare },
           { id: 'historique_sessions', label: 'Historique des Sessions', icon: History },
@@ -73,6 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       case 'BÉNÉFICIAIRE':
         return [
           { id: 'accueil', label: 'Mon Espace Bénéficiaire', icon: LayoutDashboard },
+          { id: 'eleves', label: 'Mon Dossier Élève', icon: User, badge: 'Mon suivi' },
           { id: 'planning', label: 'Mon Emploi du Temps', icon: Calendar },
           { id: 'declarer_absence', label: 'Déclarer une Absence', icon: Send },
           { id: 'mes_justificatifs', label: 'Mes Justificatifs', icon: FileText },
@@ -86,7 +93,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const navItems = getNavItems(role);
+  const rawNavItems = getNavItems(role);
+
+  // Dynamic Filtering based on custom permissions (AFFICHAGE DYNAMIQUE)
+  const rubricMapping: Record<string, RubricId> = {
+    eleves: 'eleves',
+    pointage: 'presences',
+    emargement: 'presences',
+    absences_globales: 'absences',
+    declarer_absence: 'absences',
+    justificatifs_admin: 'justificatifs',
+    mes_justificatifs: 'justificatifs',
+    statistiques: 'rapports',
+    mon_assiduite: 'rapports',
+    utilisateurs: 'utilisateurs',
+    parametres: 'parametres',
+  };
+
+  const navItems = rawNavItems.filter(item => {
+    if (item.id === 'accueil') return true;
+    const rubric = rubricMapping[item.id];
+    if (!rubric) return true;
+    return PermissionService.canPerformAction(currentUser, rubric, 'show');
+  });
 
   const getRoleHeaderInfo = (userRole: UserRole | null) => {
     switch (userRole) {
