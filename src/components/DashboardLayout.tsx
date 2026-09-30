@@ -5,6 +5,7 @@ import { RoleHomeView } from './RoleHomeView.tsx';
 import { StudentList } from './students/StudentList.tsx';
 import { AttendanceDashboard } from './attendance/AttendanceDashboard.tsx';
 import { UsersManagementView } from './permissions/UsersManagementView.tsx';
+import { SuperDataSyncView } from './superdata/SuperDataSyncView.tsx';
 import { Student } from '../types/student.ts';
 import { StudentService } from '../services/studentService.ts';
 import { PermissionService } from '../services/permissionService.ts';
@@ -44,6 +45,7 @@ export const DashboardLayout: React.FC = () => {
           ? 'Élèves de mes Groupes'
           : 'Mon Dossier Élève & Assiduité';
       case 'utilisateurs': return 'Gestion des Utilisateurs & Droits';
+      case 'superdata': return 'Passerelle & Liaison SuperData';
       case 'promotions': return 'Promotions & Groupes';
       case 'justificatifs_admin': return 'Justificatifs & Décisions';
       case 'statistiques': return 'Rapports & Statistiques';
@@ -68,6 +70,7 @@ export const DashboardLayout: React.FC = () => {
     if (rubricTab === 'pointage' || rubricTab === 'emargement') return PermissionService.canPerformAction(currentUser, 'presences', 'read');
     if (rubricTab === 'absences_globales') return PermissionService.canPerformAction(currentUser, 'absences', 'read');
     if (rubricTab === 'utilisateurs') return PermissionService.canPerformAction(currentUser, 'utilisateurs', 'read');
+    if (rubricTab === 'superdata') return PermissionService.canPerformAction(currentUser, 'superdata', 'read');
     return true;
   };
 
@@ -116,6 +119,8 @@ export const DashboardLayout: React.FC = () => {
             <StudentList />
           ) : currentTab === 'utilisateurs' ? (
             <UsersManagementView />
+          ) : currentTab === 'superdata' ? (
+            <SuperDataSyncView />
           ) : (
             <RoleHomeView
               currentTab={currentTab}

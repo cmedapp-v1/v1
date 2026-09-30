@@ -20,7 +20,8 @@ export type RubricId =
   | 'rapports'
   | 'import_export'
   | 'utilisateurs'
-  | 'parametres';
+  | 'parametres'
+  | 'superdata';
 
 export interface RubricDefinition {
   id: RubricId;
@@ -100,6 +101,13 @@ export const RUBRICS_LIST: RubricDefinition[] = [
     iconName: 'Settings',
     availableActions: ['show', 'read', 'update'],
   },
+  {
+    id: 'superdata',
+    label: 'Passerelle SuperData',
+    description: 'Liaison, connecteur API et synchronisation des données externes',
+    iconName: 'Database',
+    availableActions: ['show', 'read', 'update', 'import', 'export', 'validate'],
+  },
 ];
 
 export type UserRubricPermissions = Record<RubricId, Partial<Record<PermissionAction, boolean>>>;
@@ -153,6 +161,7 @@ export function getDefaultPermissionsForRole(role: UserRole): UserCustomPermissi
         import_export: { show: false, read: false, import: false, export: false },
         utilisateurs: { show: false, read: false, create: false, update: false, delete: false },
         parametres: { show: false, read: false, update: false },
+        superdata: { show: false, read: false, update: false, import: false, export: false, validate: false },
       },
       dataScope: {
         groupScope: 'ASSIGNED_ONLY',
@@ -173,6 +182,7 @@ export function getDefaultPermissionsForRole(role: UserRole): UserCustomPermissi
       import_export: { show: false, read: false, import: false, export: false },
       utilisateurs: { show: false, read: false, create: false, update: false, delete: false },
       parametres: { show: false, read: false, update: false },
+      superdata: { show: false, read: false, update: false, import: false, export: false, validate: false },
     },
     dataScope: {
       groupScope: 'ASSIGNED_ONLY',

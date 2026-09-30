@@ -239,6 +239,36 @@ export const RoleHomeView: React.FC<RoleHomeViewProps> = ({
             </button>
           )}
         </div>
+
+        {/* Module 3 (ADMIN): Passerelle SuperData */}
+        {role === 'ADMIN' && (
+          <div className="bg-gradient-to-r from-slate-900 to-blue-950 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between space-y-4 md:col-span-2 border border-blue-900/60">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600/40 text-blue-200 border border-blue-500/40">
+                  <Database className="w-3.5 h-3.5 text-blue-300" />
+                  <span>Interopérabilité Externe</span>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight">
+                  Passerelle & Liaison SuperData
+                </h3>
+                <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                  Connecteur bidirectionnel actif : transmission continue des feuilles d'émargement et synchronisation automatisée des identifiants MASSAR avec le serveur SuperData.
+                </p>
+              </div>
+
+              {onNavigate && (
+                <button
+                  onClick={() => onNavigate('superdata')}
+                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center gap-2 shadow-xs shrink-0 self-start sm:self-auto"
+                >
+                  <Database className="w-4 h-4 text-blue-100" />
+                  <span>Gérer la Passerelle SuperData</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Quick reassurance footer info */}

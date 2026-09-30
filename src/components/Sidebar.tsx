@@ -23,7 +23,8 @@ import {
   Building2,
   Shield,
   Briefcase,
-  User
+  User,
+  Database
 } from 'lucide-react';
 
 import { PermissionService } from '../services/permissionService.ts';
@@ -64,6 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           { id: 'absences_globales', label: 'Registre des Absences', icon: CalendarCheck },
           { id: 'justificatifs_admin', label: 'Justificatifs & Décisions', icon: FileCheck2 },
           { id: 'statistiques', label: 'Rapports & Statistiques', icon: BarChart3 },
+          { id: 'superdata', label: 'Passerelle SuperData', icon: Database, badge: 'Connecté' },
           { id: 'parametres', label: 'Paramètres du Centre', icon: Settings },
         ];
       case 'FORMATEUR':
@@ -108,6 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     mon_assiduite: 'rapports',
     utilisateurs: 'utilisateurs',
     parametres: 'parametres',
+    superdata: 'superdata',
   };
 
   const navItems = rawNavItems.filter(item => {
