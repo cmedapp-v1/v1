@@ -1,0 +1,8 @@
+{
+  "name": "Centre Deuxième Chance – Gestion des Absences",
+  "description": "Application web de gestion des absences pour le Centre Deuxième Chance avec rôles Admin, Formateur et Bénéficiaire.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

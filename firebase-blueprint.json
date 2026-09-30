@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Profil d'un utilisateur du Centre Deuxième Chance",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "ADMIN",
+            "FORMATEUR",
+            "BÉNÉFICIAIRE"
+          ]
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid",
+        "email",
+        "displayName",
+        "role",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Profils des utilisateurs et leurs rôles d'accès"
+    }
+  }
+}
